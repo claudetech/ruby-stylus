@@ -40,15 +40,19 @@ module Stylus
     # declare them as a dependency on the context using 'depend_on' method.
     # This method will recursively scans all dependency to ensure that
     # the current stylesheet tracks down nested dependencies.
-    def depend_on(context, data)
+    def depend_on(context, data, prefix = [])
       dependencies = data.scan(IMPORT_SCANNER).flatten.compact.uniq
 
       dependencies.each do |path|
+        dirname = File.dirname(path)
+        path = File.join(*prefix, path)
+        prefix << dirname if dirname != '.'
+
         asset = resolve(context, path)
 
         if asset
           context.depend_on(asset)
-          depend_on(context, File.read(asset))
+          depend_on(context, File.read(asset), prefix)
         end
       end
     end
