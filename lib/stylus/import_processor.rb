@@ -46,7 +46,11 @@ module Stylus
       dependencies.each do |path|
         dirname = File.dirname(path)
         path = File.join(*prefix, path)
-        prefix << dirname if dirname != '.'
+        pushed = false
+        if dirname != '.'
+          prefix << dirname
+          pushed = true
+        end
 
         asset = resolve(context, path)
 
@@ -54,6 +58,8 @@ module Stylus
           context.depend_on(asset)
           depend_on(context, File.read(asset), prefix)
         end
+
+        prefix.pop if pushed
       end
     end
 
